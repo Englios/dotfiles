@@ -1,0 +1,7 @@
+{
+    "custom/ram": {
+        "exec": "~/.config/waybar/scripts/ram-stats.sh",
+        "interval": 30,
+        "tooltip": true
+    }
+}

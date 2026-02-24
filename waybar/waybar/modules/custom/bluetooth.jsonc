@@ -1,0 +1,10 @@
+{
+    "custom/bluetooth": {
+        "exec": "~/.config/waybar/scripts/bluetooth-status.sh",
+        "return-type": "json",
+        "interval": 5,
+        "on-click": "bluetoothctl show | grep -q 'Powered: yes' && bluetoothctl power off || bluetoothctl power on && sleep 1 && pkill -SIGRTMIN+8 waybar",
+        "on-click-right": "blueman-manager",
+        "signal": 8
+    }
+}

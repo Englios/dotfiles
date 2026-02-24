@@ -13,7 +13,7 @@ window#waybar {
     background: rgba(21, 18, 27, 0.6);
     color: #cdd6f4;
     transition-property: background-color;
-    transition-duration: .5s;
+    transition-duration: 0.5s;
 }
 
 window#waybar.hidden {
@@ -28,14 +28,16 @@ tooltip {
     border-color: #11111b;
 }
 
+/* ============================================================
+   WORKSPACES
+   ============================================================ */
+
 #workspaces,
 #custom-workspaces {
     background: rgba(8, 7, 10, 0.6);
-    margin: 5px 5px 5px 5px;
     padding: 6px 5px;
     border-radius: 18px;
-    margin-top: 7px;
-    margin-bottom: 7px;
+    margin: 7px 5px;
     border: 0.5px solid #032412;
 }
 
@@ -81,131 +83,100 @@ tooltip {
 }
 
 /* ============================================================
-   ALL MODULE PILL BASE STYLE
+   BASE PILL — all standalone modules
    ============================================================ */
 
 #clock,
-#network,
-#bluetooth,
-#custom-window,
 #window,
 #custom-fuzzel,
-#custom-power_btn,
-#custom-lock_screen,
-#custom-wol,
 #custom-tailscale,
-#custom-updates,
-#custom-github,
 #custom-media,
-#custom-gpu,
-#custom-cpu,
-#temperature,
-#pulseaudio,
-#tray,
-#custom-swaync {
+#tray {
     background-color: #2f354a;
-    margin: 0 0 0 0;
-    padding: 0px 7px 0px 7px;
+    padding: 0px 10px;
     border-radius: 18px;
     margin-top: 10px;
     margin-bottom: 10px;
-    border: none;
 }
-
 
 /* ============================================================
    LEFT MODULES
    ============================================================ */
 
 #clock {
-    border-radius: 18px 0 0 18px;
     color: #fab387;
     margin-left: 5px;
+    margin-right: 5px;
 }
 
-#network {
-    border-radius: 0px;
-    color: #f9e2af;
-}
-
-#network.disabled,
-#network.disconnected {
-    color: #f38ba8;
-}
-
-#bluetooth {
-    border-radius: 0 18px 18px 0px;
-    color: #89b4fa;
-}
-
-#bluetooth.off {
-    color: #6c7086;
-}
-
-#custom-window,
 #window {
     background: #cdd6f4;
     color: #1e1e2e;
-    border-radius: 18px;
     margin-left: 20px;
     margin-right: 20px;
 }
 
-window#waybar.empty #custom-window,
 window#waybar.empty #window {
     background-color: transparent;
     color: transparent;
 }
 
-
 /* ============================================================
    CENTER MODULES
    ============================================================ */
 
-/* Group containers - transparent wrappers */
-#exit,
-#hardware,
-#audio {
-    background: transparent;
-    margin: 0;
-    padding: 0;
-}
 #custom-fuzzel {
     opacity: 0.6;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
+/* Exit group — power + lock as a pill */
 #custom-power_btn {
+    background-color: #2f354a;
     color: #9c8bfd;
     border-radius: 18px 0px 0px 18px;
+    padding: 0px 7px 0px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 0;
 }
 
 #custom-lock_screen {
+    background-color: #2f354a;
     color: #9c8bfd;
-    border-radius: 0 18px 18px 0;
+    border-radius: 0px 18px 18px 0px;
+    padding: 0px 10px 0px 7px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 0;
+    margin-right: 5px;
 }
 
-#custom-tailscale,
-#custom-wol {
+#custom-tailscale {
     border-radius: 18px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
-#custom-tailscale.green,
-#custom-wol.green {
+#custom-tailscale.green {
     color: #a6e3a1;
 }
 
-#custom-tailscale.red,
-#custom-wol.red {
+#custom-tailscale.red {
     color: #fd8b9e;
 }
 
-#custom-wol.orange {
-    color: #FFA500;
-}
-
+/* Updates + github group pill */
 #custom-updates {
-    border-radius: 0px;
-    padding: 0px 7px 0px 7px;
+    background-color: #2f354a;
+    border-radius: 18px 0 0 18px;
+    padding: 0px 7px 0px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 0;
 }
 
 #custom-updates.green {
@@ -221,7 +192,13 @@ window#waybar.empty #window {
 }
 
 #custom-github {
+    background-color: #2f354a;
     border-radius: 0px 18px 18px 0px;
+    padding: 0px 10px 0px 7px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 0;
+    margin-right: 5px;
 }
 
 #custom-github.green {
@@ -236,32 +213,24 @@ window#waybar.empty #window {
     color: #eba0ac;
 }
 
-
 /* ============================================================
    RIGHT MODULES
    ============================================================ */
 
 #custom-media {
-    padding-right: 10px;
-    margin-right: 10px;
-    margin-left: 10px;
-}
-
-#custom-media.custom-spotify {
-    color: #1db954;
-}
-
-#temperature {
-    color: #8be9fd;
-    border-radius: 18px;
+    padding: 0px 10px;
+    margin-left: 5px;
     margin-right: 5px;
 }
 
-/* GPU stats pill (left of cpu in group/hardware) */
+/* Hardware group pill: GPU | CPU | RAM */
 #custom-gpu {
+    background-color: #2f354a;
     color: #a6e3a1;
     border-radius: 18px 0 0 18px;
-    padding-right: 5px;
+    padding: 0px 7px 0px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     margin-left: 5px;
     margin-right: 0;
 }
@@ -274,13 +243,15 @@ window#waybar.empty #window {
     color: #eba0ac;
 }
 
-/* CPU stats pill (right of gpu in group/hardware) */
 #custom-cpu {
+    background-color: #2f354a;
     color: #89dceb;
-    border-radius: 0 18px 18px 0;
-    padding-left: 5px;
+    border-radius: 0;
+    padding: 0px 7px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     margin-left: 0;
-    margin-right: 5px;
+    margin-right: 0;
 }
 
 #custom-cpu.high {
@@ -291,30 +262,107 @@ window#waybar.empty #window {
     color: #eba0ac;
 }
 
-#temperature.critical {
-    color: #eba0ac;
-}
-
-#pulseaudio {
-    border-radius: 18px 0 0 18px;
-    color: #89b4fa;
-}
-
-#pulseaudio.muted {
-    color: #f38ba8;
-}
-
-#pulseaudio.microphone {
-    border-radius: 0 18px 18px 0;
+#custom-ram {
+    background-color: #2f354a;
     color: #cba6f7;
+    border-radius: 0 18px 18px 0;
+    padding: 0px 10px 0px 7px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 0;
     margin-right: 5px;
 }
 
-#tray {
-    border-radius: 18px 0 0 18px;
+/* Network group pill: Network | Bluetooth */
+box#network {
+    background-color: transparent;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
+label#network {
+    background-color: #2f354a;
+    border-radius: 18px 0 0 18px;
+    color: #f9e2af;
+    padding: 0px 7px 0px 10px;
+    margin: 0;
+}
+
+label#network.disabled,
+label#network.disconnected {
+    color: #f38ba8;
+}
+
+#custom-bluetooth {
+    background-color: #2f354a;
+    border-radius: 0 18px 18px 0;
+    color: #89b4fa;
+    padding: 0px 10px 0px 7px;
+    margin: 0;
+}
+
+#custom-bluetooth.off {
+    color: #6c7086;
+}
+
+#custom-bluetooth.connected {
+    color: #a6e3a1;
+}
+
+/* Audio group pill: Speaker | Mic */
+box#audio {
+    background-color: transparent;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+/* Strip event_box wrappers inside the audio group */
+box#audio * {
+    margin: 0;
+    padding: 0;
+}
+
+label#pulseaudio {
+    background-color: #2f354a;
+    border-radius: 18px 0 0 18px;
+    color: #89b4fa;
+    padding: 0px 7px 0px 10px;
+    margin: 0;
+}
+
+label#pulseaudio.muted {
+    color: #6c7086;
+}
+
+label#pulseaudio.microphone {
+    background-color: #2f354a;
+    border-radius: 0 18px 18px 0;
+    color: #cba6f7;
+    padding: 0px 10px 0px 7px;
+    margin: 0;
+}
+
+label#pulseaudio.microphone.source-muted {
+    color: #6c7086;
+}
+/* Tray + swaync group pill */
+#tray {
+    border-radius: 18px 0 0 18px;
+    padding: 0px 7px 0px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 0;
+}
 #custom-swaync {
+    background-color: #2f354a;
     border-radius: 0px 18px 18px 0px;
+    padding: 0px 10px 0px 7px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 0;
     margin-right: 5px;
 }

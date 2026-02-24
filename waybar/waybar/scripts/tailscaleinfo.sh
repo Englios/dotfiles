@@ -7,40 +7,48 @@ if [ -z "$hostnames" ]; then
     hostnames=("$sshhost")
 fi
 
-tooltip=""
 css_class="green"
 online_count=0
+online_section=""
+offline_section=""
 
-for i in "${!hostnames[@]}"; do
-    hostname="${hostnames[$i]}"
-
+for hostname in "${hostnames[@]}"; do
     ip=$(tailscale ip -4 "$hostname" 2>/dev/null)
-    status=$(tailscale status 2>/dev/null | awk -v h="$hostname" '$0 ~ h {print $NF}')
+    status=$(tailscale status 2>/dev/null | awk -v h="$hostname" '$0 ~ h {print}')
 
-    if [ "$status" = "offline" ] || [ -z "$status" ]; then
+
+    if [ "$sshhost" = "$hostname" ]; then
+        label="* ${hostname}"
+    else
+        label="  ${hostname}"
+    fi
+
+    if echo "$status" | grep -q "offline" || [ -z "$status" ]; then
         if [ "$sshhost" = "$hostname" ]; then
             css_class=red
         fi
-        status_icon=""
+        offline_section+="${label}: ${ip}"$'\n'
     else
         online_count=$((online_count + 1))
-        status_icon=""
-    fi
-
-    if [ "$sshhost" = "$hostname" ]; then
-        tooltip+=">  ${hostname}: ${ip} ${status_icon}"
-    else
-        tooltip+="   ${hostname}: ${ip} ${status_icon}"
-    fi
-
-    j=$((i + 1))
-    if [ $j -lt ${#hostnames[@]} ]; then
-        tooltip+=$'\n'
+        online_section+="${label}: ${ip}"$'\n'
     fi
 done
 
-# Short display: icon + online count
-text=" ${online_count}/${#hostnames[@]}"
+
+tooltip=""
+if [ -n "$online_section" ]; then
+    tooltip+=" Online"$'\n'
+    tooltip+="${online_section}"
+fi
+if [ -n "$offline_section" ]; then
+    [ -n "$online_section" ] && tooltip+=$'\n'
+    tooltip+=" Offline"$'\n'
+    tooltip+="${offline_section}"
+fi
+
+tooltip="${tooltip%$'\n'}"
+
+text="󰖂 ${online_count}/${#hostnames[@]}"
 
 jq -nc \
     --arg text "$text" \

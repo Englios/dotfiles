@@ -47,5 +47,8 @@
         "editor.defaultFormatter": "geequlim.godot-tools"
     },
     "zig.zls.enabled": "on",
-    "go.toolsManagement.autoUpdate": true
+    "go.toolsManagement.autoUpdate": true,
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }
