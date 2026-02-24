@@ -1,0 +1,16 @@
+{
+    "custom/media": {
+        "format": "{}",
+        "escape": true,
+        "return-type": "json",
+        "max-length": 40,
+        "on-click": "/usr/bin/playerctl play-pause",
+        "on-click-right": "/usr/bin/playerctl stop",
+        "smooth-scrolling-threshold": 10,
+        "on-scroll-up": "/usr/bin/playerctl next",
+        "on-scroll-down": "/usr/bin/playerctl previous",
+        "exec": "/usr/bin/python3 ~/.config/waybar/scripts/mediaplayer.py",
+        "tooltip": true,
+        "tooltip-format": "{}"
+    }
+}

@@ -1,0 +1,11 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+meta+v",
+        "command": "toggleVim"
+    },
+    {
+        "key": "ctrl+meta+j",
+        "command": "workbench.action.togglePanel"
+    }
+]

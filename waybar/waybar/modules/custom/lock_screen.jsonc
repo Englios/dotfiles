@@ -1,0 +1,8 @@
+{
+    "custom/lock_screen": {
+        "format": "",
+        "on-click": "swaylock",
+        "tooltip-format": "Lock Screen",
+        "tooltip": true
+    }
+}

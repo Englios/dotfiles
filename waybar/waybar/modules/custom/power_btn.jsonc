@@ -1,0 +1,8 @@
+{
+    "custom/power_btn": {
+        "format": "",
+        "on-click": "wlogout --protocol layer-shell",
+        "tooltip-format": "Power Options",
+        "tooltip": true
+    }
+}

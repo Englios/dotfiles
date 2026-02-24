@@ -1,0 +1,136 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "edit_predictions": {
+    "disabled_globs": [],
+  },
+  "auto_indent_on_paste": false,
+  "git_panel": {
+    "tree_view": true,
+    "sort_by_path": true,
+    "status_style": "icon",
+  },
+  "minimap": {
+    "current_line_highlight": "line",
+    "thumb": "always",
+    "show": "always",
+  },
+  "project_panel": {
+    "hide_gitignore": false,
+  },
+  "indent_guides": {
+    "line_width": 1,
+    "active_line_width": 2,
+    "background_coloring": "disabled",
+    "coloring": "indent_aware",
+  },
+  "hard_tabs": false,
+  "autosave": "on_focus_change",
+  "context_servers": {
+    "mcp-server-brave-search": {
+      "enabled": true,
+      "settings": {
+        "brave_api_key": "YOUR_BRAVE_API_KEY"
+      }
+    },
+    "mcp-server-exa-search": {
+      "enabled": true,
+      "settings": {
+        "exa_api_key": "YOUR_EXA_API_KEY"
+      }
+    },
+    "mcp-server-tavily": {
+      "enabled": true,
+      "settings": {},
+    },
+    "mcp-server-github": {
+      "enabled": true,
+      "settings": {
+        "github_personal_access_token": "YOUR_GITHUB_PAT",
+      },
+    },
+    "mcp-server-context7": {
+      "enabled": true,
+      "settings": {
+        "context7_api_key": "YOUR_CONTEXT7_API_KEY",
+      },
+    },
+  },
+  "agent_servers": {
+    "your_agent": {
+      "type": "custom",
+      "command": "path_to_executable",
+      "args": [],
+      "env": {},
+    },
+  },
+  "features": {
+    "edit_prediction_provider": "copilot",
+  },
+  "agent": {
+    "profiles": {
+      "edit": {
+        "default_model": {
+          "provider": "copilot_chat",
+          "model": "gpt-5",
+        },
+        "name": "Edit",
+        "tools": {
+          "grep": true,
+          "terminal": true,
+          "thinking": true,
+          "fetch": true,
+          "create_directory": true,
+          "copy_path": true,
+          "list_directory": true,
+          "open": true,
+          "read_file": true,
+          "edit_file": true,
+        },
+        "enable_all_context_servers": false,
+        "context_servers": {
+          "mcp-server-exa-search": {
+            "tools": {
+              "web_search_exa": true
+            }
+          },
+          "mcp-server-context7": {
+            "tools": {
+              "query-docs": true
+            }
+          },
+          "mcp-server-brave-search": {
+            "tools": {
+              "brave_web_search": true,
+              "brave_summarizer": false,
+              "brave_local_search": false
+            }
+          }
+        },
+      },
+    },
+    "default_profile": "write",
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "gpt-5.2",
+    },
+    "always_allow_tool_actions": true,
+    "play_sound_when_agent_done": true,
+  },
+  "base_keymap": "VSCode",
+  "icon_theme": "Catppuccin Mocha",
+  "vim_mode": true,
+  "ui_font_size": 16,
+  "buffer_font_size": 16,
+  "theme": {
+    "mode": "light",
+    "light": "Quiet Light",
+    "dark": "Kanagawa Wave",
+  },
+}

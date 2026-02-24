@@ -1,0 +1,51 @@
+{
+    "@azure.argTenant": "",
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "chat.viewSessions.orientation": "stacked",
+    "claudeCode.preferredLocation": "panel",
+    "docker.extension.enableComposeLanguageServer": false,
+    "dotnetAcquisitionExtension.allowInvalidPaths": true,
+    "dotnetAcquisitionExtension.existingDotnetPath": [
+        {
+            "extensionId": "ms-dotnettools.csharp",
+            "path": "/home/linuxbrew/.linuxbrew/opt/dotnet/libexec/dotnet"
+        }
+    ],
+    "dotnetAcquisitionExtension.sharedExistingDotnetPath": "/home/linuxbrew/.linuxbrew/opt/dotnet/libexec/dotnet",
+    "editor.guides.bracketPairs": true,
+    "files.autoSave": "afterDelay",
+    "git.autofetch": true,
+    "github.copilot.enable": {
+        "*": true,
+        "markdown": true,
+        "plaintext": false,
+        "scminput": false
+    },
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "print.folder.exclude": [
+        "{bin,obj,out}",
+        "node_modules",
+        "data",
+        "**/*.{bin,exe,dll,hex,pdb,pdf,pfx,png,jpg,gif,bmp,suo,design}"
+    ],
+    "print.folder.fileNames": true,
+    "print.folder.include": [],
+    "print.folder.includeFileList": false,
+    "print.folder.maxFiles": 30,
+    "print.folder.maxLines": 1200,
+    "workbench.activityBar.location": "top",
+    "workbench.iconTheme": "catppuccin-latte",
+    "editor.minimap.size": "fill",
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "workbench.colorTheme": "August - Kanagawa",
+    "notebook.lineNumbers": "on",
+    "[gdscript]": {
+        "editor.defaultFormatter": "geequlim.godot-tools"
+    },
+    "zig.zls.enabled": "on",
+    "go.toolsManagement.autoUpdate": true
+}

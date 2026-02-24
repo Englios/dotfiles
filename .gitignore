@@ -1,0 +1,36 @@
+# Dotfiles - Ignored Files
+
+# Backup files
+*.backup
+*.bak
+*~
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# OpenCode sensitive files
+opencode/.config/opencode/antigravity-accounts.json
+
+# Sensitive configs (use .template files for reference)
+ssh/.ssh/config
+zed/.config/zed/settings.json
+
+# Encrypted secrets (use age/sops for these)
+*.age
+*.sops.yaml
+
+# Local overrides (for secrets you don't want to commit)
+*.local
+*.local.json
+*.local.toml
+
+# Editor swap files
+*.swp
+*.swo
+.*.swp
+.jj

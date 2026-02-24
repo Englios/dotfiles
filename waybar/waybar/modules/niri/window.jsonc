@@ -1,0 +1,10 @@
+{
+    "niri/window": {
+        "format": "{}",
+        "max-length": 60,
+        "rewrite": {
+            "(.*) — Mozilla Firefox": "󰈹 $1",
+            "(.*) - Visual Studio Code": "󰨞 $1"
+        }
+    }
+}

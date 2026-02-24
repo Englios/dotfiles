@@ -1,0 +1,7 @@
+{
+    "custom/fuzzel": {
+        "format": " Apps",
+        "tooltip-format": "Application Launcher",
+        "on-click": "fuzzel"
+    }
+}

@@ -1,0 +1,69 @@
+{
+    "layer": "top",
+    "position": "top",
+    "mod": "dock",
+    "exclusive": true,
+    "passthrough": false,
+    "gtk-layer-shell": true,
+
+    // Explicitly target the primary output. Remove or set to [] for all monitors.
+    "output": "DP-1",
+
+    "include": [
+        "~/.config/waybar/modules/*.jsonc",
+        "~/.config/waybar/modules/custom/*.jsonc",
+        "~/.config/waybar/modules/extra/*.jsonc",
+        "~/.config/waybar/modules/niri/*.jsonc"
+    ],
+
+    "modules-left": [
+        "clock",
+        "network",
+        "bluetooth",
+        "niri/window"
+    ],
+    "modules-center": [
+        "custom/fuzzel",
+        "niri/workspaces",
+        "group/exit",
+        "custom/tailscale",
+        "custom/updates",
+        "custom/github"
+    ],
+    "modules-right": [
+        "custom/media",
+        "group/hardware",
+        "group/audio",
+        "tray",
+        "custom/swaync"
+    ],
+
+
+
+    // Group Hardware (GPU + CPU)
+    "group/hardware": {
+        "orientation": "horizontal",
+        "modules": [
+            "custom/gpu",
+            "custom/cpu"
+        ]
+    },
+
+    // Group IO Audio
+    "group/audio": {
+        "orientation": "horizontal",
+        "modules": [
+            "pulseaudio",
+            "pulseaudio#microphone"
+        ]
+    },
+
+    // Group Exit
+    "group/exit": {
+        "orientation": "horizontal",
+        "modules": [
+            "custom/power_btn",
+            "custom/lock_screen"
+        ]
+    }
+}

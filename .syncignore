@@ -1,0 +1,16 @@
+# Protected paths that sync.sh will NEVER touch
+# These paths are machine-specific or contain secrets
+# One path per line, paths are relative to $HOME
+
+.ssh
+.gnupg
+.config/zed
+.aws
+.kube
+.docker
+.npmrc
+.pypirc
+.netrc
+.git-credentials
+.config/opencode/secrets.json
+
