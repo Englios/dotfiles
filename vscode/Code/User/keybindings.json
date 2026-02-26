@@ -5,7 +5,7 @@
         "command": "toggleVim"
     },
     {
-        "key": "ctrl+meta+j",
+        "key": "shift+j",
         "command": "workbench.action.togglePanel"
     }
 ]
