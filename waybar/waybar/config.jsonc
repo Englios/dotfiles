@@ -44,11 +44,11 @@
         "orientation": "horizontal",
         "modules": [
             "custom/gpu",
+            "custom/gpu-vram",
             "custom/cpu",
             "custom/ram"
         ]
     },
-
     // Group Network + Bluetooth
     "group/network": {
         "orientation": "horizontal",
