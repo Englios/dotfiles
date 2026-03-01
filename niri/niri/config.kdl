@@ -94,7 +94,7 @@ output "HDMI-A-1" {
 
    // transform "normal"
 
-   // position x=0 y=1440
+   // position x=0 y=1440  ← correct position when enabled
 }
 
 // Settings that influence how windows are positioned and sized.
