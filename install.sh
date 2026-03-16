@@ -52,22 +52,56 @@ resolve_stow_target() {
     fi
 }
 
-# All available packages
-PACKAGES=(
-    "zsh"
-    "oh-my-zsh"
-    "git"
-    "ssh"
-    "kitty"
-    "ghostty"
-    "vscode"
-    "zed"
-    "nvim"
-    "btop"
-    "neofetch"
-    "pop-shell"
-    "profile"
-    "opencode"
+is_excluded_package_dir() {
+    local name=$1
+    local excluded
+
+    for excluded in "${PACKAGE_EXCLUDES[@]}"; do
+        [[ "$name" == "$excluded" ]] && return 0
+    done
+
+    return 1
+}
+
+discover_packages() {
+    local dir name
+
+    PACKAGES=()
+
+    while IFS= read -r dir; do
+        name="${dir##*/}"
+
+        # Skip hidden folders and known non-package dirs.
+        [[ "$name" == .* ]] && continue
+        is_excluded_package_dir "$name" && continue
+
+        PACKAGES+=("$name")
+    done < <(find "$DOTFILES_DIR" -mindepth 1 -maxdepth 1 -type d | sort)
+
+    if [[ ${#PACKAGES[@]} -eq 0 ]]; then
+        print_error "No packages found in $DOTFILES_DIR"
+        exit 1
+    fi
+}
+
+resolve_package_target() {
+    local package=$1
+
+    # If package contains top-level dotfiles/dirs (e.g. .zshrc/.ssh), target HOME.
+    if find "$DOTFILES_DIR/$package" -mindepth 1 -maxdepth 1 -name ".*" | grep -q .; then
+        echo "$HOME"
+    else
+        # Config-style packages target whatever .stowrc specifies (usually ~/.config).
+        echo "$STOW_TARGET"
+    fi
+}
+
+# Auto-discovered package list and explicit excludes.
+PACKAGES=()
+PACKAGE_EXCLUDES=(
+    "images"
+    "ssh.examples"
+    "zed.examples"
 )
 
 # Interactive selection result (used when install runs without package args)
@@ -146,6 +180,10 @@ set_default_shell() {
 
 # Check for Oh My Zsh
 check_omz() {
+    if ! is_valid_package "oh-my-zsh"; then
+        return
+    fi
+
     if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
         print_warning "Oh My Zsh is not installed."
         read -p "Install Oh My Zsh? (y/n) " -n 1 -r
@@ -164,7 +202,8 @@ check_omz() {
 # Backup existing files
 backup_existing() {
     local package=$1
-    local target_dir="$STOW_TARGET"
+    local target_dir
+    target_dir=$(resolve_package_target "$package")
     
     # Find all files that would be stowed
     for file in $(find "$DOTFILES_DIR/$package" -type f 2>/dev/null); do
@@ -201,6 +240,7 @@ setup_sensitive_file() {
 # Stow a package
 stow_package() {
     local package=$1
+    local target_dir
     
     if [[ ! -d "$DOTFILES_DIR/$package" ]]; then
         print_warning "Package '$package' not found, skipping..."
@@ -212,12 +252,14 @@ stow_package() {
         print_warning "Skipping oh-my-zsh (Oh My Zsh not installed)"
         return
     fi
+
+    target_dir=$(resolve_package_target "$package")
     
     backup_existing "$package"
     
-    print_status "Stowing $package..."
+    print_status "Stowing $package -> $target_dir..."
     cd "$DOTFILES_DIR"
-    stow -v --adopt "$package" 2>&1 | grep -v "^LINK:" || true
+    stow -v --adopt "$package" -t "$target_dir" 2>&1 | grep -v "^LINK:" || true
     
     # --adopt brings local changes into repo (keeps your actual values)
     # Do NOT git checkout here - that would overwrite real configs with templates
@@ -228,10 +270,13 @@ stow_package() {
 # Unstow a package
 unstow_package() {
     local package=$1
+    local target_dir
+
+    target_dir=$(resolve_package_target "$package")
     
-    print_status "Unstowing $package..."
+    print_status "Unstowing $package from $target_dir..."
     cd "$DOTFILES_DIR"
-    stow -v -D "$package" 2>&1 | grep -v "^UNLINK:" || true
+    stow -v -D "$package" -t "$target_dir" 2>&1 | grep -v "^UNLINK:" || true
     print_success "Unstowed $package"
 }
 
@@ -495,6 +540,8 @@ select_packages_interactive() {
 main() {
     local command="${1:-install}"
     shift || true
+
+    discover_packages
     
     case "$command" in
         install)
