@@ -30,6 +30,8 @@ UI_FG_YELLOW='\033[93m'
 UI_FG_BLACK='\033[30m'
 UI_BG_BLUE='\033[44m'
 
+UI_USE_COLOR=1
+
 # Full-screen selector state
 UI_ACTIVE=0
 
@@ -37,6 +39,62 @@ print_status() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[OK]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+terminal_supports_color() {
+    local colors
+
+    [[ -n "${NO_COLOR:-}" ]] && return 1
+    [[ -t 1 ]] || return 1
+    [[ -n "${TERM:-}" && "${TERM}" != "dumb" ]] || return 1
+
+    if command -v tput &> /dev/null; then
+        colors=$(tput colors 2>/dev/null || echo 0)
+        [[ "$colors" =~ ^[0-9]+$ ]] || colors=0
+        (( colors >= 8 )) || return 1
+    fi
+
+    return 0
+}
+
+initialize_terminal_theme() {
+    if terminal_supports_color; then
+        UI_USE_COLOR=1
+        RED='\033[0;31m'
+        GREEN='\033[0;32m'
+        YELLOW='\033[1;33m'
+        BLUE='\033[0;34m'
+        NC='\033[0m'
+
+        UI_RESET='\033[0m'
+        UI_BG_BLACK='\033[40m'
+        UI_FG_WHITE='\033[97m'
+        UI_FG_DIM='\033[90m'
+        UI_FG_CYAN='\033[96m'
+        UI_FG_GREEN='\033[92m'
+        UI_FG_RED='\033[91m'
+        UI_FG_YELLOW='\033[93m'
+        UI_FG_BLACK='\033[30m'
+        UI_BG_BLUE='\033[44m'
+    else
+        UI_USE_COLOR=0
+        RED=''
+        GREEN=''
+        YELLOW=''
+        BLUE=''
+        NC=''
+
+        UI_RESET=''
+        UI_BG_BLACK=''
+        UI_FG_WHITE=''
+        UI_FG_DIM=''
+        UI_FG_CYAN=''
+        UI_FG_GREEN=''
+        UI_FG_RED=''
+        UI_FG_YELLOW=''
+        UI_FG_BLACK=''
+        UI_BG_BLUE=''
+    fi
+}
 
 resolve_stow_target() {
     local target_line target_value
@@ -485,6 +543,11 @@ ui_init() {
     # Alternate screen + hide cursor (TUI feel)
     tput smcup 2>/dev/null || true
     tput civis 2>/dev/null || true
+    if [[ "$UI_USE_COLOR" -eq 1 ]]; then
+        printf '\033[0m\033[40m\033[2J\033[H'
+    else
+        printf '\033[0m\033[2J\033[H'
+    fi
     UI_ACTIVE=1
 }
 
@@ -496,22 +559,17 @@ ui_cleanup() {
     UI_ACTIVE=0
 }
 
-ui_clear_fullscreen_black() {
-    local rows cols r
-
-    rows=$(tput lines 2>/dev/null || echo 24)
-    cols=$(tput cols 2>/dev/null || echo 80)
-
+ui_begin_frame() {
     printf '\033[H'
-    for ((r = 0; r < rows; r++)); do
-        printf '%b%*s%b\n' "$UI_BG_BLACK" "$cols" "" "$UI_RESET"
-    done
-    printf '\033[H'
+}
+
+ui_print_line() {
+    printf '\033[2K%b%b%b\n' "$UI_BG_BLACK" "$1" "$UI_RESET"
 }
 
 ui_rule() {
     local cols char
-    char=${1:-─}
+    char=${1:--}
     cols=$(tput cols 2>/dev/null || echo 80)
     printf '%*s' "$cols" '' | tr ' ' "$char"
 }
@@ -534,13 +592,13 @@ render_package_selector() {
     page_end=$((page_start + page_size - 1))
     (( page_end >= total )) && page_end=$((total - 1))
 
-    ui_clear_fullscreen_black
-    echo -e "${UI_BG_BLACK}${UI_FG_CYAN} Dotfiles Installer ${UI_RESET}"
-    echo -e "${UI_BG_BLACK}${UI_FG_WHITE} Select packages to install and stow ${UI_RESET}"
-    echo -e "${UI_BG_BLACK}${UI_FG_DIM}$(ui_rule)${UI_RESET}"
-    echo -e "${UI_BG_BLACK}${UI_FG_DIM} Selected: ${selected_count}/${total}   •   Page: $((page_index + 1))/${total_pages}   •   Showing: $((page_start + 1))-$((page_end + 1)) ${UI_RESET}"
-    echo -e "${UI_BG_BLACK}${UI_FG_DIM} Move ↑/↓ or j/k • Toggle Enter • Next/Prev page ]/[ ${UI_RESET}"
-    echo ""
+    ui_begin_frame
+    ui_print_line "${UI_FG_CYAN} Dotfiles Installer "
+    ui_print_line "${UI_FG_WHITE} Select packages to install and stow "
+    ui_print_line "${UI_FG_DIM}$(ui_rule)"
+    ui_print_line "${UI_FG_DIM} Selected: ${selected_count}/${total}   •   Page: $((page_index + 1))/${total_pages}   •   Showing: $((page_start + 1))-$((page_end + 1)) "
+    ui_print_line "${UI_FG_DIM} Move ↑/↓ or j/k • Toggle Enter • Next/Prev page ]/[ "
+    ui_print_line ""
 
     for ((i = page_start; i <= page_end; i++)); do
         if [[ "${PACKAGE_FLAGS[$i]}" -eq 1 ]]; then
@@ -577,17 +635,11 @@ render_package_selector() {
             target_hint="~/.config"
         fi
 
-        printf '%b %s %b%s%b %b%s%b %b%s%b%b\n' \
-            "$line_prefix" \
-            "$pointer" \
-            "$marker_color" "$marker" "$line_prefix" \
-            "$name_color" "$row_number  $display_name" "$line_prefix" \
-            "$UI_FG_DIM" "$target_hint" "$line_prefix" \
-            "$line_suffix"
+        ui_print_line "${line_prefix} ${pointer} ${marker_color}${marker}${line_prefix} ${name_color}${row_number}  ${display_name}${line_prefix} ${UI_FG_DIM}${target_hint}${line_prefix}${line_suffix}"
     done
 
-    echo ""
-    echo -e "${UI_BG_BLACK}${UI_FG_DIM}$(ui_rule)${UI_RESET}"
+    ui_print_line ""
+    ui_print_line "${UI_FG_DIM}$(ui_rule)"
 
     if [[ "$selected_count" -gt 0 ]]; then
         continue_color="$UI_FG_GREEN"
@@ -595,7 +647,8 @@ render_package_selector() {
         continue_color="$UI_FG_RED"
     fi
 
-    echo -e "${UI_BG_BLACK}${continue_color}[ c ] Continue${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[ Enter ] Toggle${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[ a ] All${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[ n ] None${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[ q ] Cancel${UI_RESET}"
+    ui_print_line "${continue_color}[ c ] Continue${UI_FG_WHITE}  [ Enter ] Toggle  [ a ] All  [ n ] None  [ q ] Cancel"
+    printf '\033[J'
 }
 
 select_packages_interactive() {
@@ -701,6 +754,7 @@ main() {
     local command="${1:-install}"
     shift || true
 
+    initialize_terminal_theme
     discover_packages
     
     case "$command" in
