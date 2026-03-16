@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Dotfiles Install Script
-# Uses GNU Stow to symlink dotfiles to home directory
+# Uses GNU Stow to symlink dotfiles into home/config directories
 
 set -e
 
@@ -106,6 +106,7 @@ PACKAGE_EXCLUDES=(
 
 # Interactive selection result (used when install runs without package args)
 CHOSEN_PACKAGES=()
+SELECTION_CANCELLED=0
 
 # Files with secrets - not stowed, copied from template on first setup
 SENSITIVE_FILES=(
@@ -199,6 +200,128 @@ check_omz() {
     fi
 }
 
+detect_package_manager() {
+    if command -v apt &> /dev/null; then
+        echo "apt"
+    elif command -v pacman &> /dev/null; then
+        echo "pacman"
+    elif command -v brew &> /dev/null; then
+        echo "brew"
+    else
+        echo ""
+    fi
+}
+
+get_system_packages_for_dotfile_package() {
+    local package=$1
+    local manager=$2
+
+    case "$package" in
+        zsh) printf '%s\n' "zsh" ;;
+        git) printf '%s\n' "git" ;;
+        nvim) printf '%s\n' "neovim" ;;
+        kitty) printf '%s\n' "kitty" ;;
+        btop) printf '%s\n' "btop" ;;
+        neofetch) printf '%s\n' "neofetch" ;;
+        fuzzel) printf '%s\n' "fuzzel" ;;
+        niri) printf '%s\n' "niri" ;;
+        waybar) printf '%s\n' "waybar" ;;
+        ghostty)
+            # Package availability varies widely by distro/repo.
+            [[ "$manager" == "pacman" ]] && printf '%s\n' "ghostty"
+            ;;
+        pop-shell)
+            if [[ "$manager" == "apt" ]]; then
+                printf '%s\n' "gnome-shell-extension-pop-shell"
+            elif [[ "$manager" == "pacman" ]]; then
+                printf '%s\n' "pop-shell"
+            fi
+            ;;
+        vscode)
+            if [[ "$manager" == "apt" || "$manager" == "pacman" ]]; then
+                printf '%s\n' "code"
+            fi
+            ;;
+    esac
+}
+
+install_system_dependencies_for_packages() {
+    local manager package
+    local reply
+    local -a deps all_deps
+    local seen_deps=""
+
+    if [[ "${SKIP_SYSTEM_INSTALL:-0}" == "1" ]]; then
+        print_warning "Skipping system package install (SKIP_SYSTEM_INSTALL=1)"
+        return
+    fi
+
+    manager=$(detect_package_manager)
+    if [[ -z "$manager" ]]; then
+        print_warning "No supported package manager found (apt/pacman/brew). Skipping system installs."
+        return
+    fi
+
+    for package in "$@"; do
+        mapfile -t deps < <(get_system_packages_for_dotfile_package "$package" "$manager")
+
+        for dep in "${deps[@]}"; do
+            if [[ " $seen_deps " != *" $dep "* ]]; then
+                all_deps+=("$dep")
+                seen_deps+=" $dep"
+            fi
+        done
+    done
+
+    if [[ ${#all_deps[@]} -eq 0 ]]; then
+        print_status "No mapped system dependencies to install for selected packages."
+        return
+    fi
+
+    echo ""
+    print_status "System packages to install via $manager:"
+    printf '  - %s\n' "${all_deps[@]}"
+    echo ""
+
+    if [[ -z "${AUTO_CONFIRM_INSTALL:-}" ]]; then
+        read -r -p "Proceed with system package installation? [Y/n] " reply
+        if [[ "$reply" =~ ^[Nn]$ ]]; then
+            print_warning "Skipping system package installation by user choice"
+            return
+        fi
+    fi
+
+    print_status "Attempting system package installs via: $manager"
+
+    if [[ "$manager" == "apt" ]]; then
+        sudo apt update || print_warning "apt update failed; continuing with install attempts"
+        sudo apt install -y "${all_deps[@]}" || print_warning "Some packages failed to install via apt"
+    elif [[ "$manager" == "pacman" ]]; then
+        sudo pacman -S --noconfirm --needed "${all_deps[@]}" || print_warning "Some packages failed to install via pacman"
+    elif [[ "$manager" == "brew" ]]; then
+        brew install "${all_deps[@]}" || print_warning "Some packages failed to install via brew"
+    fi
+}
+
+confirm_stow_plan() {
+    local reply pkg target
+
+    echo ""
+    print_status "Stow plan (symlink changes):"
+    for pkg in "$@"; do
+        target=$(resolve_package_target "$pkg")
+        echo "  - $pkg -> $target"
+    done
+    echo ""
+
+    read -r -p "Proceed with stowing selected packages? [Y/n] " reply
+    if [[ "$reply" =~ ^[Nn]$ ]]; then
+        return 1
+    fi
+
+    return 0
+}
+
 # Backup existing files
 backup_existing() {
     local package=$1
@@ -259,7 +382,7 @@ stow_package() {
     
     print_status "Stowing $package -> $target_dir..."
     cd "$DOTFILES_DIR"
-    stow -v --adopt "$package" -t "$target_dir" 2>&1 | grep -v "^LINK:" || true
+    stow -v --adopt "$package" -t "$target_dir"
     
     # --adopt brings local changes into repo (keeps your actual values)
     # Do NOT git checkout here - that would overwrite real configs with templates
@@ -276,7 +399,7 @@ unstow_package() {
     
     print_status "Unstowing $package from $target_dir..."
     cd "$DOTFILES_DIR"
-    stow -v -D "$package" -t "$target_dir" 2>&1 | grep -v "^UNLINK:" || true
+    stow -v -D "$package" -t "$target_dir"
     print_success "Unstowed $package"
 }
 
@@ -287,7 +410,7 @@ show_help() {
     echo "Usage: $0 [command] [packages...]"
     echo ""
     echo "Commands:"
-    echo "  install [packages]    Install/stow specified packages"
+    echo "  install [packages]    Attempt system install + stow specified packages"
     echo "  remove [packages]     Remove specified packages"
     echo "  list                  List available packages"
     echo "  help                  Show this help message"
@@ -297,6 +420,9 @@ show_help() {
     echo "  $0 install all        # Install all packages"
     echo "  $0 install zsh git    # Install only zsh and git"
     echo "  $0 remove vscode      # Remove vscode package"
+    echo ""
+    echo "Environment options:"
+    echo "  SKIP_SYSTEM_INSTALL=1   Skip apt/pacman/brew install attempts"
     echo ""
     echo "Available packages:"
     printf '  %s\n' "${PACKAGES[@]}"
@@ -387,7 +513,7 @@ render_package_selector() {
     local cursor=$1
     local i marker pointer selected_count
     local total page_size total_pages page_index page_start page_end
-    local marker_color name_color line_prefix line_suffix display_name
+    local marker_color name_color line_prefix line_suffix display_name continue_color
 
     selected_count=$(count_selected_packages)
     total=${#PACKAGES[@]}
@@ -402,7 +528,7 @@ render_package_selector() {
 
     ui_clear_fullscreen_black
     echo -e "${UI_BG_BLACK}${UI_FG_CYAN}Dotfiles package selector${UI_RESET}"
-    echo -e "${UI_BG_BLACK}${UI_FG_DIM}Move: ↑/↓ (or k/j) | Toggle: Enter | Start: s | All on: a | All off: n | Prev/Next page: [/ ] | Quit: q${UI_RESET}"
+    echo -e "${UI_BG_BLACK}${UI_FG_DIM}Move: ↑/↓ (or k/j) | Toggle: Enter | Continue install: c | All on: a | All off: n | Prev/Next page: [/ ] | Quit: q${UI_RESET}"
     echo -e "${UI_BG_BLACK}${UI_FG_DIM}Page $((page_index + 1))/${total_pages} • Showing $((page_start + 1))-$((page_end + 1)) of $total${UI_RESET}"
     echo ""
 
@@ -443,6 +569,14 @@ render_package_selector() {
 
     echo ""
     echo -e "${UI_BG_BLACK}${UI_FG_CYAN}Selected: $selected_count/$total${UI_RESET}"
+
+    if [[ "$selected_count" -gt 0 ]]; then
+        continue_color="$UI_FG_GREEN"
+    else
+        continue_color="$UI_FG_RED"
+    fi
+
+    echo -e "${UI_BG_BLACK}${continue_color}[c] Continue install${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[Enter] Toggle${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[q] Cancel${UI_RESET}"
 }
 
 select_packages_interactive() {
@@ -451,6 +585,7 @@ select_packages_interactive() {
     local -a PACKAGE_FLAGS=()
 
     CHOSEN_PACKAGES=()
+    SELECTION_CANCELLED=0
     page_size=${SELECTOR_PAGE_SIZE:-8}
     (( page_size < 1 )) && page_size=8
 
@@ -510,7 +645,7 @@ select_packages_interactive() {
                 cursor=$((cursor + page_size))
                 (( cursor >= ${#PACKAGES[@]} )) && cursor=$((${#PACKAGES[@]} - 1))
                 ;;
-            "s"|"S")
+            "c"|"C"|"s"|"S")
                 selected_count=$(count_selected_packages)
                 if [[ "$selected_count" -eq 0 ]]; then
                     print_warning "Select at least one package before continuing"
@@ -520,11 +655,17 @@ select_packages_interactive() {
                 fi
                 ;;
             "q"|"Q")
-                print_error "Installation cancelled"
-                exit 1
+                SELECTION_CANCELLED=1
+                break
                 ;;
         esac
     done
+
+    if [[ "$SELECTION_CANCELLED" -eq 1 ]]; then
+        ui_cleanup
+        trap - EXIT INT TERM
+        return 1
+    fi
 
     for idx in "${!PACKAGES[@]}"; do
         if [[ "${PACKAGE_FLAGS[$idx]}" -eq 1 ]]; then
@@ -553,7 +694,10 @@ main() {
             
             local pkgs=("$@")
             if [[ ${#pkgs[@]} -eq 0 ]]; then
-                select_packages_interactive
+                if ! select_packages_interactive; then
+                    print_warning "Cancelled by user. No packages were installed or stowed."
+                    exit 0
+                fi
                 pkgs=("${CHOSEN_PACKAGES[@]}")
             elif [[ ${#pkgs[@]} -eq 1 && "${pkgs[0]}" == "all" ]]; then
                 pkgs=("${PACKAGES[@]}")
@@ -564,6 +708,15 @@ main() {
             
             echo ""
             print_status "Installing packages: ${pkgs[*]}"
+            echo ""
+
+            install_system_dependencies_for_packages "${pkgs[@]}"
+            echo ""
+
+            if ! confirm_stow_plan "${pkgs[@]}"; then
+                print_warning "Stow cancelled by user. No symlinks were changed."
+                exit 0
+            fi
             echo ""
             
             for pkg in "${pkgs[@]}"; do
