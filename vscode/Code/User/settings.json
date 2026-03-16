@@ -3,7 +3,6 @@
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
     },
-    "chat.viewSessions.orientation": "stacked",
     "claudeCode.preferredLocation": "panel",
     "docker.extension.enableComposeLanguageServer": false,
     "dotnetAcquisitionExtension.allowInvalidPaths": true,
@@ -19,8 +18,8 @@
     "git.autofetch": true,
     "github.copilot.enable": {
         "*": true,
-        "markdown": true,
         "plaintext": false,
+        "markdown": true,
         "scminput": false
     },
     "github.copilot.nextEditSuggestions.enabled": true,
@@ -41,7 +40,7 @@
     "[typescript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
-    "workbench.colorTheme": "August - Kanagawa",
+    "workbench.colorTheme": "Solarized Light",
     "notebook.lineNumbers": "on",
     "[gdscript]": {
         "editor.defaultFormatter": "geequlim.godot-tools"
@@ -50,5 +49,27 @@
     "go.toolsManagement.autoUpdate": true,
     "[css]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
-    }
+    },
+    "chat.viewSessions.orientation": "stacked",
+    "github.copilot.chat.backgroundCompaction": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.copilotMemory.enabled": true,
+    "github.copilot.chat.alternateGeminiModelFPrompt.enabled": true,
+    "github.copilot.chat.alternateGptPrompt.enabled": true,
+    "github.copilot.chat.anthropic.contextEditing.mode": "clear-both",
+    "github.copilot.chat.anthropic.tools.websearch.enabled": true,
+    "github.copilot.chat.completionsFetcher": "node-fetch",
+    "github.copilot.chat.newWorkspace.useContext7": true,
+    "github.copilot.chat.switchAgent.enabled": true,
+    "github.copilot.chat.languageContext.inline.typescript.enabled": true,
+    "github.copilot.chat.languageContext.typescript.enabled": true,
+    "inlineChat.enableV2": true,
+    "inlineChat.affordance": "editor",
+    "inlineChat.notebookAgent": true,
+    "inlineChat.renderMode": "hover",
+    "inlineChat.defaultModel": "Auto (copilot)",
+    "workbench.browser.enableChatTools": true,
+    "git.blame.editorDecoration.enabled": true,
+    "git.blame.editorDecoration.disableHover": true,
+    "remote.SSH.localServerDownload": "always"
 }
