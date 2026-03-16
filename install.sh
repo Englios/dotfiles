@@ -509,11 +509,19 @@ ui_clear_fullscreen_black() {
     printf '\033[H'
 }
 
+ui_rule() {
+    local cols char
+    char=${1:-─}
+    cols=$(tput cols 2>/dev/null || echo 80)
+    printf '%*s' "$cols" '' | tr ' ' "$char"
+}
+
 render_package_selector() {
     local cursor=$1
     local i marker pointer selected_count
     local total page_size total_pages page_index page_start page_end
     local marker_color name_color line_prefix line_suffix display_name continue_color
+    local row_number target_hint
 
     selected_count=$(count_selected_packages)
     total=${#PACKAGES[@]}
@@ -527,9 +535,11 @@ render_package_selector() {
     (( page_end >= total )) && page_end=$((total - 1))
 
     ui_clear_fullscreen_black
-    echo -e "${UI_BG_BLACK}${UI_FG_CYAN}Dotfiles package selector${UI_RESET}"
-    echo -e "${UI_BG_BLACK}${UI_FG_DIM}Move: ↑/↓ (or k/j) | Toggle: Enter | Continue install: c | All on: a | All off: n | Prev/Next page: [/ ] | Quit: q${UI_RESET}"
-    echo -e "${UI_BG_BLACK}${UI_FG_DIM}Page $((page_index + 1))/${total_pages} • Showing $((page_start + 1))-$((page_end + 1)) of $total${UI_RESET}"
+    echo -e "${UI_BG_BLACK}${UI_FG_CYAN} Dotfiles Installer ${UI_RESET}"
+    echo -e "${UI_BG_BLACK}${UI_FG_WHITE} Select packages to install and stow ${UI_RESET}"
+    echo -e "${UI_BG_BLACK}${UI_FG_DIM}$(ui_rule)${UI_RESET}"
+    echo -e "${UI_BG_BLACK}${UI_FG_DIM} Selected: ${selected_count}/${total}   •   Page: $((page_index + 1))/${total_pages}   •   Showing: $((page_start + 1))-$((page_end + 1)) ${UI_RESET}"
+    echo -e "${UI_BG_BLACK}${UI_FG_DIM} Move ↑/↓ or j/k • Toggle Enter • Next/Prev page ]/[ ${UI_RESET}"
     echo ""
 
     for ((i = page_start; i <= page_end; i++)); do
@@ -559,16 +569,25 @@ render_package_selector() {
             name_color="$UI_FG_YELLOW"
         fi
 
-        printf '%b %s %b%s%b %b%s%b%b\n' \
+        row_number=$(printf '%02d' $((i + 1)))
+        target_hint=$(resolve_package_target "${PACKAGES[$i]}")
+        if [[ "$target_hint" == "$HOME" ]]; then
+            target_hint="~"
+        else
+            target_hint="~/.config"
+        fi
+
+        printf '%b %s %b%s%b %b%s%b %b%s%b%b\n' \
             "$line_prefix" \
             "$pointer" \
             "$marker_color" "$marker" "$line_prefix" \
-            "$name_color" "$display_name" "$line_prefix" \
+            "$name_color" "$row_number  $display_name" "$line_prefix" \
+            "$UI_FG_DIM" "$target_hint" "$line_prefix" \
             "$line_suffix"
     done
 
     echo ""
-    echo -e "${UI_BG_BLACK}${UI_FG_CYAN}Selected: $selected_count/$total${UI_RESET}"
+    echo -e "${UI_BG_BLACK}${UI_FG_DIM}$(ui_rule)${UI_RESET}"
 
     if [[ "$selected_count" -gt 0 ]]; then
         continue_color="$UI_FG_GREEN"
@@ -576,7 +595,7 @@ render_package_selector() {
         continue_color="$UI_FG_RED"
     fi
 
-    echo -e "${UI_BG_BLACK}${continue_color}[c] Continue install${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[Enter] Toggle${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[q] Cancel${UI_RESET}"
+    echo -e "${UI_BG_BLACK}${continue_color}[ c ] Continue${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[ Enter ] Toggle${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[ a ] All${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[ n ] None${UI_RESET}  ${UI_BG_BLACK}${UI_FG_WHITE}[ q ] Cancel${UI_RESET}"
 }
 
 select_packages_interactive() {
