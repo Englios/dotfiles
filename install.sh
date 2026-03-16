@@ -99,10 +99,11 @@ initialize_terminal_theme() {
 resolve_stow_target() {
     local target_line target_value
 
-    target_line=$(grep -E '^--target=' "$DOTFILES_DIR/.stowrc" 2>/dev/null | tail -n 1 || true)
-    target_value="${target_line#--target=}"
+    target_line=$(grep -E '^[[:space:]]*(--)?target=' "$DOTFILES_DIR/.stowrc" 2>/dev/null | tail -n 1 || true)
+    target_value="${target_line#*=}"
+    target_value="${target_value##[[:space:]]}"
 
-    if [[ -n "$target_value" && "$target_value" != "$target_line" ]]; then
+    if [[ -n "$target_value" ]]; then
         # Expand leading ~
         STOW_TARGET="${target_value/#\~/$HOME}"
     else
