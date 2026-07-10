@@ -322,7 +322,10 @@ install_system_dependencies_for_packages() {
     fi
 
     for package in "$@"; do
-        mapfile -t deps < <(get_system_packages_for_dotfile_package "$package" "$manager")
+        deps=()
+        while IFS= read -r dep; do
+            deps+=("$dep")
+        done < <(get_system_packages_for_dotfile_package "$package" "$manager")
 
         for dep in "${deps[@]}"; do
             if [[ " $seen_deps " != *" $dep "* ]]; then
