@@ -668,6 +668,8 @@ binds {
     Print { screenshot; }
     Ctrl+Print { screenshot-screen; }
     Alt+Print { screenshot-window; }
+    Ctrl+Shift+S hotkey-overlay-title="Take Screenshot" { screenshot; }
+    Super+Shift+S hotkey-overlay-title="Select Area Screenshot" { spawn "flameshot" "gui"; }
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here

@@ -5,7 +5,16 @@
         "command": "toggleVim"
     },
     {
-        "key": "shift+j",
+        "key": "ctrl+shift+alt+j",
         "command": "workbench.action.togglePanel"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "-workbench.action.togglePanel"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "-extension.vim_ctrl+b",
+        "when": "editorTextFocus && vim.active && vim.use<C-b> && !inDebugRepl && vim.mode != 'Insert'"
     }
 ]

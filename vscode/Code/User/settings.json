@@ -40,7 +40,7 @@
     "[typescript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
-    "workbench.colorTheme": "Solarized Light",
+    "workbench.colorTheme": "August - BeardedTheme Surprising Blueberry",
     "notebook.lineNumbers": "on",
     "[gdscript]": {
         "editor.defaultFormatter": "geequlim.godot-tools"
@@ -71,5 +71,32 @@
     "workbench.browser.enableChatTools": true,
     "git.blame.editorDecoration.enabled": true,
     "git.blame.editorDecoration.disableHover": true,
-    "remote.SSH.localServerDownload": "always"
+    "remote.SSH.localServerDownload": "always",
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "terminal.integrated.commandsToSkipShell": [
+        "kilo-code.new.agentManagerOpen",
+        "kilo-code.new.agentManager.showTerminal",
+        "kilo-code.new.agentManager.runScript"
+    ],
+    "kilo-code.new.browserAutomation.enabled": true,
+    "kilo-code.new.browserAutomation.headless": true,
+    "kilo-code.new.autocomplete.enableChatAutocomplete": true,
+    "kilo-code.new.autocomplete.enableSmartInlineTaskKeybinding": true,
+    "svelte.enable-ts-plugin": true,
+    "makefile.configureOnOpen": true,
+    "chatgpt.composerEnterBehavior": "cmdIfMultiline",
+    "github.copilot.nextEditSuggestions.eagerness": "low",
+    "kilo-code.new.agentWorkStyle": "skipped",
+    "chatgpt.reviewDelivery": "inline",
+    "yaml.disableSchemaDetection": [
+        "**/.github/workflows/*.yml",
+        "**/.github/workflows/*.yaml",
+        "**/.gitea/workflows/*.yml",
+        "**/.gitea/workflows/*.yaml",
+        "**/.forgejo/workflows/*.yml",
+        "**/.forgejo/workflows/*.yaml"
+    ],
+    "chatgpt.followUpQueueMode": "steer"
 }

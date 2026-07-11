@@ -15,8 +15,8 @@ alias gd='git diff'
 #windows boot
 alias boot_windows='sudo bootctl set-oneshot auto-windows && sudo reboot'
 
-# Vesktop with Niri screen sharing fix
-alias vesktop='XDG_CURRENT_DESKTOP=gnome /opt/Vesktop/vesktop --enable-features=UseOzonePlatform --ozone-platform=wayland'
+# Vesktop (Wayland + PipeWire capture compatibility)
+alias vesktop='/opt/Vesktop/vesktop --enable-features=UseOzonePlatform,WebRTCPipeWireCapturer --ozone-platform=wayland --disable-gpu-memory-buffer-video-frames'
 
 # Sunshine instance switcher
 alias sunshine='~/Scripts/sunshine-switch.sh'
