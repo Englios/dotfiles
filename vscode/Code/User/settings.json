@@ -40,7 +40,7 @@
     "[typescript]": {
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
-    "workbench.colorTheme": "August - BeardedTheme Surprising Blueberry",
+    "workbench.colorTheme": "Solarized Light",
     "notebook.lineNumbers": "on",
     "[gdscript]": {
         "editor.defaultFormatter": "geequlim.godot-tools"
@@ -98,5 +98,6 @@
         "**/.forgejo/workflows/*.yml",
         "**/.forgejo/workflows/*.yaml"
     ],
-    "chatgpt.followUpQueueMode": "steer"
+    "chatgpt.followUpQueueMode": "steer",
+    "vim.useSystemClipboard": true
 }
