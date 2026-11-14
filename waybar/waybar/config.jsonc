@@ -1,4 +1,9 @@
+// Two bars: the full bar on the main monitor, and a slim one on HDMI-A-1
+// (the iPad streaming display). Waybar creates/destroys the HDMI-A-1 bar
+// automatically as that output is turned on/off.
+[
 {
+    "name": "main",
     "layer": "top",
     "position": "top",
     "mod": "dock",
@@ -75,4 +80,31 @@
             "custom/lock_screen"
         ]
     }
+},
+{
+    // Slim bar for the iPad streaming display: workspaces + active window + clock
+    "name": "ipad",
+    "layer": "top",
+    "position": "top",
+    "mod": "dock",
+    "exclusive": true,
+    "passthrough": false,
+    "gtk-layer-shell": true,
+    "output": "HDMI-A-1",
+
+    "include": [
+        "~/.config/waybar/modules/*.jsonc",
+        "~/.config/waybar/modules/niri/*.jsonc"
+    ],
+
+    "modules-left": [
+        "niri/workspaces"
+    ],
+    "modules-center": [
+        "niri/window"
+    ],
+    "modules-right": [
+        "clock"
+    ]
 }
+]
